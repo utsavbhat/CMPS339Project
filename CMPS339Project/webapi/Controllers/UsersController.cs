@@ -13,6 +13,7 @@ namespace webapi.Controllers
         {
             _userRepo = companyRepo;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
@@ -60,7 +61,7 @@ namespace webapi.Controllers
                 //log error
                 return StatusCode(500, ex.Message);
             }
-            
+
         }
 
         [HttpGet]
@@ -70,6 +71,50 @@ namespace webapi.Controllers
             return Ok(deleteUser);
         }
 
+        #region User Detail
+        
+        [HttpGet]
+        public async Task<IActionResult> GetUserDetail(int id)
+        {
+            try
+            {
+                var user = await _userRepo.GetUserDetail(id);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                //log error
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveUserDetail([FromBody] UserDetails form)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var user = await _userRepo.SaveUserDetail(form);
+                    return Ok(user);
+                }
+                return StatusCode(500, "Invalid ModelState");
+            }
+            catch (Exception ex)
+            {
+                //log error
+                return StatusCode(500, ex.Message);
+            }
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteUserDetail(int id)
+        {
+            var deleteUser = await _userRepo.DeleteUser(id);
+            return Ok(deleteUser);
+        }
+        #endregion
 
     }
 }

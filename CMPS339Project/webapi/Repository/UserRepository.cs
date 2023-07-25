@@ -70,5 +70,52 @@ namespace webapi.Repository
                 return users;
             }
         }
+
+        #region User Detail
+        public async Task<UserDetails> GetUserDetail(int id)
+        {
+            var query = $@"SELECT * FROM UserDetails WHERE Id = {id}";
+            using (var connection = _context.CreateConnection())
+            {
+                var user = await connection.QueryFirstAsync<UserDetails>(query);
+                return user;
+            }
+        }
+
+        public async Task<UserDetails> SaveUserDetail(UserDetails user)
+        {
+            if (user.Id == 0)
+            {
+                var query = $@"Insert INTO UserDetails (Email, PhoneNumber, Address, UserID) Values (@Email, @PhoneNumber, @Address, @UserID)";
+                using (var connection = _context.CreateConnection())
+                {
+                    var userReturn = await connection.QueryAsync(query, new { Email = user.Email, PhoneNumber = user.PhoneNumber, Address = user.Address, UserID = user.UserId });
+                    return user;
+                }
+            }
+            else
+            {
+                var query = $@"UPDATE UserDetails SET Email = '{user.Email}', PhoneNumber = '{user.PhoneNumber}', Address = '{user.Address}', UserID = {user.UserId} WHERE Id= {user.Id}";
+                using (var connection = _context.CreateConnection())
+                {
+                    var userReturn = await connection.QueryAsync(query);
+                    return user;
+                }
+            }
+        }
+
+        public async Task<bool> DeleteUserDetail(int id)
+        {
+            var query = $@"DELETE FROM UserDetails WHERE Id = {id}";
+            using (var connection = _context.CreateConnection())
+            {
+                var userReturn = await connection.QueryAsync(query);
+                return true;
+            }
+        }
+        #endregion
+
+
+
     }
 }
