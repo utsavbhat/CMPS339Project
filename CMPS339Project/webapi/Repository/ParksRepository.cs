@@ -16,7 +16,7 @@ namespace webapi.Repository
 
         public async Task<IEnumerable<Parks>> GetParks()
         {
-            var query = "SELECT * FROM Parks WHERE IsActive = 1";
+            var query = "SELECT * FROM Parks";
             using (var connection = _context.CreateConnection())
             {
                 var Parks = await connection.QueryAsync<Parks>(query);
