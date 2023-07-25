@@ -63,7 +63,7 @@ namespace webapi.Controllers
             
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var deleteUser = await _userRepo.DeleteUser(id);

@@ -1,59 +1,101 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 export default class App extends Component {
     static displayName = App.name;
-
     constructor(props) {
         super(props);
-        this.state = { forecasts: [], loading: true };
+
+        this.state = { users: [], loading: true, showForm: false, };
     }
 
     componentDidMount() {
-        //this.populateWeatherData();
+        this.loadUserTable();
     }
 
-    static renderForecastsTable(forecasts) {
+    renderUsers(users) {
         return (
-            <table className='table table-striped' aria-labelledby="tabelLabel">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Temp. (C)</th>
-                        <th>Temp. (F)</th>
-                        <th>Summary</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {forecasts.map(forecast =>
-                        <tr key={forecast.date}>
-                            <td>{forecast.date}</td>
-                            <td>{forecast.temperatureC}</td>
-                            <td>{forecast.temperatureF}</td>
-                            <td>{forecast.summary}</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-        );
-    }
+            <div className="container">
+                <div className="row">
+                    <div className="col-6">
+                        <table className='table table-striped' aria-labelledby="tabelLabel">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map(user =>
+                                    <tr key={user.id}>
+                                        <td>{user.username}</td>
+                                        <td className="d-flex justify-content-end">
+                                            <button type="button"
+                                                className="btn btn-danger"
+                                                onClick={this.handleClick.bind(this, user.id)}>Delete</button>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
 
-    render() {
-        let contents = this.state.loading
-            ? <p><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationreact">https://aka.ms/jspsintegrationreact</a> for more details.</em></p>
-            : App.renderForecastsTable(this.state.forecasts);
-
-        return (
-            <div>
-                <h1 id="tabelLabel" >Weather forecast</h1>
-                <p>This component demonstrates fetching data from the server.</p>
-                {contents}
+                    </div>
+                </div>
             </div>
         );
     }
 
-    async populateWeatherData() {
-        const response = await fetch('weatherforecast');
-        const data = await response.json();
-        this.setState({ forecasts: data, loading: false });
+    handleClick = (id) => {
+        this.deleteUser(id);
+    };    
+
+    render() {
+        let userTable = this.renderUsers(this.state.users);
+
+        return (
+
+            <div className="container">
+                <h1>Active Users</h1>
+                {userTable}
+            </div>
+        );
+    }
+
+    loadUserTable() {
+
+        var base_URL = "https://localhost:7144";
+        var self = this;
+
+        return axios.get(base_URL + '/Users/GetUsers')
+            .then(function (response) {
+                self.setState({ users: response.data, loading: false });
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+            })
+            .finally(function () {
+                // always executed
+            });
+    }
+
+    deleteUser(ID) {
+        var base_URL = "https://localhost:7144";
+        var self = this;
+
+        return axios.get(base_URL + '/Users/DeleteUser', {
+            params: {
+                id: ID
+            }
+        })
+            .then(function (response) {
+                self.loadUserTable();
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+            })
+            .finally(function () {
+                // always executed
+            });
     }
 }
